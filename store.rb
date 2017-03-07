@@ -1,7 +1,7 @@
 # initialize datasets
 @shopping_cart = []
 
-@depts = [:fiction, :non_Fiction, :travel, :children]
+@depts = [:fiction, :nonfiction, :travel, :children]
 
 @books = {
   fiction: [
@@ -11,9 +11,9 @@
     {itemnr:104 , title: "De Overloper", author: "Siegfried Lenz", price: 19.90},
     {itemnr:105 , title: "Eden", author: "Marcel Moring", price: 19.99}
   ],
-  non_ficton: [
+  nonfiction: [
     {itemnr:201 , title: "Hygge", author: "Melk Wiking", price: 19.99},
-    {itemnr:202 , title: "Lenin in de trein", author: "Catherine Merridale" , price: 29.90},
+    {itemnr:202 , title: "Lenin in de trein", author: "Catherine Merridale", price: 29.90},
     {itemnr:203 , title: "Katoen", author: "Sven Beckert", price: 49.90 }
   ],
   travel: [
@@ -29,12 +29,13 @@
   ]
 }
 
+# @buy_a_book = "Yes"
 
 # helper programs ###############
 
 def print_divider
   puts "*" * 40
-  puts "\n"
+  # puts "\n"
 end
 
 def print_progress_bar
@@ -45,11 +46,13 @@ end
 # helper programs ##############
 
 def print_depts
+  print_divider
   counter = 1
   @depts.each  do |dept|
     puts "#{counter} - #{dept}"
     counter += 1
   end
+  print_divider
 end
 
 def dept_chooser
@@ -58,16 +61,77 @@ def dept_chooser
     puts "Please enter the number of the department you wish to browse"
     dept_choice = gets.chomp.to_i
   end
+  dept_choice -= 1
   puts "Welcome to department #{@depts[dept_choice]}"
-  return dept_choice
+  return (dept_choice)
 end
 
+def print_books(current_dept)
+  cur_dept = @depts[current_dept]
+  @books[cur_dept].each do |dept_books|
+    puts "#{dept_books[:itemnr]} - title: #{dept_books[:title]} by #{dept_books[:author]} for #{dept_books[:price]} Euros."
+  end
+end
+
+def buy_product(current_dept)
+  puts "Please enter the number of the item to add it to the shopping cart."
+  chosen_item = gets.chomp.to_i
+  cur_dept = @depts[current_dept]
+  @books[cur_dept].each do |dept_books|
+    if dept_books[:itemnr] == chosen_item
+        @shopping_cart << dept_books
+    end
+  end
+  puts "Thank you, your cart is as follows:"
+  print_cart
+
+end
+
+def print_cart
+  @shopping_cart.each do |book|
+    puts "#{book[:itemnr]} - title: #{book[:title]} by #{book[:author]} for #{book[:price]} Euros."
+  end
+  print_divider
+  puts "Totalling: #{cart_total} Euros."
+end
+
+def cart_total
+  total = 0
+  @shopping_cart.each do |book|
+    total += book[:price]
+  end
+  return total
+end
+
+def buy_another_book
+  puts "Would you like to buy another book?"
+  buy_a_book = gets.chomp.downcase
+  if buy_a_book == "no" || buy_a_book == "n"
+    return "no"
+  elsif buy_a_book == "yes" || buy_a_book == "y"
+    return "yes"
+  else
+    buy_another_book
+  end
+end
 
 
 
 #*********** MAIN *******************
 
-puts "Welcome to my bookstore, we have the following departments:"
-print_depts
+puts "Welcome to my bookstore, we have the following departments: "
+loop do
+  print_depts
 
-dept_chooser
+  chosen_dept = dept_chooser
+  print_books(chosen_dept)
+
+  buy_product(chosen_dept)
+
+  if buy_another_book == "no"
+    puts "Thank you for your service."
+    puts "You have purchased: "
+    print_cart
+    break
+  end
+end
